@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HCO Studio Lite — Asset & Place ID Cloud</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bone: #F6F4EE;
+      --bone-card: #FFFFFF;
+      --bone-subtle: #ECE9E0;
+      --border: #DFDBD0;
+      --ink: #121212;
+      --ink-soft: #262626;
+      --muted: #6E6B63;
+      --success: #15803D;
+      --warning: #B45309;
+      --danger: #B91C1C;
+    }
+    * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bone);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* Navbar */
+    header {
+      background: rgba(246, 244, 238, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .nav-wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--ink);
+      border-radius: 50%;
+    }
+    .pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .pill {
+      background: var(--bone-subtle);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .pill.dark { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+
+    /* Layout & Cards */
+    .main-wrap { max-width: 1080px; margin: 32px auto; padding: 0 24px 60px; }
+    .card {
+      background: var(--bone-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 12px 32px -12px rgba(18, 18, 18, 0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover { color: var(--ink); background: var(--bone-subtle); }
+    .tab-btn.active { background: var(--ink); color: var(--bone); }
+
+    /* Forms & Buttons */
+    label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    input[type="text"], input[type="password"], input[type="number"], select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bone);
+      color: var(--ink);
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    input:focus, select:focus { border-color: var(--ink); background: #fff; }
+    .field { margin-bottom: 16px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--ink);
+      color: var(--bone);
+      border: 1px solid var(--ink);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--ink-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -6px rgba(18, 18, 18, 0.25);
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn.secondary {
+      background: var(--bone);
+      color: var(--ink);
+      border-color: var(--border);
+    }
+    .btn.secondary:hover:not(:disabled) { background: var(--bone-subtle); box-shadow: none; }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed var(--border);
+      background: var(--bone);
+      border-radius: 16px;
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-bottom: 18px;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--ink);
+      background: var(--bone-subtle);
+      transform: scale(1.005);
+    }
+    .cost-banner {
+      background: var(--bone-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+    }
+    .id-box {
+      background: var(--ink);
+      color: var(--bone);
+      padding: 18px 20px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+    }
+    .id-num { font-family: monospace; font-size: 1.45rem; font-weight: 700; letter-spacing: 0.03em; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { border-bottom: 1px solid var(--border); padding: 12px 10px; text-align: left; }
+    th { color: var(--muted); font-weight: 600; }
+    .step-card {
+      background: var(--bone);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      line-height: 1.55;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="main-wrap" style="max-width: 440px; margin-top: 80px; display: none;">
+    <div class="card fade-up">
+      <div class="brand" style="margin-bottom: 6px;"><span class="brand-dot"></span> HCO STUDIO LITE</div>
+      <p style="color: var(--muted); font-size: 0.88rem; margin-top: 0; margin-bottom: 22px;">
+        Konversi file <code>.rbxl</code> &amp; <code>.rbxm</code> menjadi ID siap pakai untuk <strong>Studio Lite Map</strong>.
+      </p>
+
+      <div class="tabs" style="margin-bottom: 18px;">
+        <button class="tab-btn active" id="tabLoginBtn" onclick="switchAuthMode('login')">Masuk</button>
+        <button class="tab-btn" id="tabRegBtn" onclick="switchAuthMode('register')">Daftar Akun</button>
+      </div>
+
+      <form id="authForm">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="authUsername" placeholder="Masukkan username" required />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="authPassword" placeholder="Masukkan password" required />
+        </div>
+        <div id="authError" style="color: var(--danger); font-size: 0.84rem; margin-bottom: 12px;"></div>
+        <button type="submit" class="btn" style="width: 100%;" id="authSubmitBtn">Masuk ke Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP SCREEN -->
+  <div id="appScreen" style="display: none;">
+    <header>
+      <div class="nav-wrap">
+        <div class="brand"><span class="brand-dot"></span> HCO STUDIO LITE</div>
+        <div class="pills">
+          <span class="pill" id="userBadge">@user</span>
+          <span class="pill dark" id="creditBadge">0 Credit</span>
+          <span class="pill" id="voucherRbxlBadge">Gratis .RBXL: 0</span>
+          <span class="pill" id="voucherRbxmBadge">Gratis .RBXM: 0</span>
+          <button class="btn secondary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="logout()">Keluar</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-wrap">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('uploadTab', this)">Upload ke Studio Lite</button>
+        <button class="tab-btn" onclick="openTab('settingsTab', this)">Pengaturan &amp; Panduan API Key</button>
+        <button class="tab-btn" onclick="openTab('historyTab', this)">Riwayat ID</button>
+        <button class="tab-btn" id="adminTabBtn" style="display: none;" onclick="openTab('adminTab', this)">Panel Admin (ADMINHCO)</button>
+      </div>
+
+      <!-- TAB 1: UPLOADER -->
+      <div id="uploadTab" class="card fade-up">
+        <h2 style="margin-top: 0; font-size: 1.25rem;">Konversi File ke ID Studio Lite</h2>
+        <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 20px;">
+          Pilih metode yang sesuai dengan akun Roblox Anda. Jika akun belum verifikasi KTP/Creator Store, gunakan <strong>Mode Place ID Bypass</strong> agar tetap langsung muncul di Studio Lite!
+        </p>
+
+        <form id="uploadForm">
+          <div class="field">
+            <label>Metode Target Studio Lite</label>
+            <select id="uploadTarget" onchange="updateCostPreview()">
+              <option value="place_id">Mode Studio Lite Place ID Bypass (Tanpa Verifikasi ID / via Uncopylock Place - Khusus .RBXL)</option>
+              <option value="model_id">Mode Model Asset ID (Creator Store Public - Untuk .RBXM &amp; .RBXL)</option>
+            </select>
+          </div>
+
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+            <div style="font-weight: 600; margin-bottom: 4px;">Klik atau Tarik File <code>.rbxl</code> / <code>.rbxm</code> ke Sini</div>
+            <div style="color: var(--muted); font-size: 0.82rem;" id="selectedFileText">Belum ada file dipilih</div>
+            <input type="file" id="fileInput" accept=".rbxl,.rbxlx,.rbxm,.rbxmx" style="display:none" onchange="onFilePicked(this.files[0])" />
+          </div>
+
+          <div class="cost-banner" id="costBanner" style="display: none;">
+            <span>Estimasi Pemakaian Credit:</span>
+            <strong id="costValue">0 Credit</strong>
+          </div>
+
+          <div class="field">
+            <label>Nama Map / Model</label>
+            <input type="text" id="displayName" placeholder="Contoh: Lucky Block Map" required />
+          </div>
+
+          <div id="modelOptions" style="display: none;">
+            <div class="field">
+              <label>Mode Konversi .RBXL ke Model</label>
+              <select id="convertMode">
+                <option value="workspace">Hanya Workspace (Langsung muncul rapi sebagai bangunan di Studio Lite)</option>
+                <option value="full">Full Services (Workspace, StarterGui, ReplicatedStorage dalam Folder)</option>
+              </select>
+            </div>
+            <div class="field" style="display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" id="stripMedia" checked style="width:16px; height:16px;" />
+              <label for="stripMedia" style="margin:0; cursor:pointer; color:var(--ink);">
+                Bersihkan Sound &amp; VideoFrame otomatis (Agar tidak ditolak Creator Store)
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn" style="width: 100%;" id="uploadBtn">Proses &amp; Dapatkan ID Studio Lite</button>
+        </form>
+
+        <div id="uploadResult" style="margin-top: 20px; display: none;"></div>
+      </div>
+
+      <!-- TAB 2: SETTINGS & TUTORIAL -->
+      <div id="settingsTab" class="card fade-up" style="display: none;">
+        <h2 style="margin-top: 0; font-size: 1.25rem;">Konfigurasi API Key &amp; Place ID Studio Lite</h2>
+        <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 20px;">
+          API Key Anda dienkripsi dengan <strong>AES-256-GCM</strong> di server dan tidak pernah ditampilkan kembali.
+        </p>
+
+        <form id="settingsForm">
+          <div class="field">
+            <label>Open Cloud API Key Roblox <span id="keyHintText" style="color:var(--success);"></span></label>
+            <input type="password" id="setApiKey" placeholder="Tempel API Key baru di sini (kosongkan jika tidak ingin mengubah)" />
+          </div>
+          <div class="field">
+            <label>Roblox User ID Anda (Wajib untuk Mode Model ID)</label>
+            <input type="text" id="setUserId" placeholder="Contoh: 123456789" />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="field">
+              <label>Universe ID (Untuk Mode Place ID Bypass Studio Lite)</label>
+              <input type="text" id="setUniverseId" placeholder="Contoh: 987654321" />
+            </div>
+            <div class="field">
+              <label>Place ID (Place yang sudah di-Uncopylock)</label>
+              <input type="text" id="setPlaceId" placeholder="Contoh: 1122334455" />
+            </div>
+          </div>
+          <button type="submit" class="btn">Simpan Konfigurasi Aman</button>
+          <span id="settingsMsg" style="margin-left: 12px; font-size: 0.86rem;"></span>
+        </form>
+
+        <hr style="border: none; border-top: 1px solid var(--border); margin: 28px 0;" />
+
+        <h3 style="font-size: 1.05rem;">Langkah-Langkah Membuat API Key &amp; Setup Studio Lite (Tanpa Verifikasi KTP)</h3>
+        <div class="step-card">
+          <strong>Langkah 1: Siapkan 1 Place Uncopylock di Akun Roblox Anda</strong><br/>
+          1. Buka <a href="https://create.roblox.com/dashboard/creations" target="_blank">Roblox Creator Hub - Creations</a>.<br/>
+          2. Klik titik tiga pada salah satu Experience/Place kosong Anda &rarr; pilih <strong>Copy Universe ID</strong> dan klik masuk untuk menyalin <strong>Place ID</strong>.<br/>
+          3. Masuk ke menu <strong>Configure Place &rarr; Permissions</strong>, lalu centang <strong>"Allow users to download a copy of this place" (Uncopylock)</strong> dan klik Save.
+        </div>
+        <div class="step-card">
+          <strong>Langkah 2: Buat Open Cloud API Key</strong><br/>
+          1. Buka <a href="https://create.roblox.com/dashboard/credentials" target="_blank">Creator Hub - Credentials</a> lalu klik <strong>Create API Key</strong>.<br/>
+          2. Pada bagian <strong>Access Permissions</strong>, tambahkan:<br/>
+          &bull; <strong>universe-places</strong> (Experience Management): pilih Experience Anda dan centang <code>write</code>.<br/>
+          &bull; <strong>Assets API</strong>: centang <code>read</code> &amp; <code>write</code>.<br/>
+          &bull; <strong>Creator Store Products</strong>: centang <code>read</code> &amp; <code>write</code>.<br/>
+          3. Pada bagian <strong>Accepted IP Addresses</strong>, isi <code>0.0.0.0/0</code> lalu klik <strong>Save &amp; Generate Key</strong>.<br/>
+          4. Salin API Key tersebut dan simpan pada form di atas.
+        </div>
+        <div class="step-card">
+          <strong>Langkah 3: Cara Memasukkan ID ke Map Studio Lite</strong><br/>
+          1. Buka game <strong>Studio Lite</strong> di Roblox.<br/>
+          2. Buka <strong>Toolbox &rarr; Import Model</strong>.<br/>
+          3. Masukkan <strong>ID</strong> yang keluar dari web ini, lalu tekan <strong>Get / Import</strong>. Seluruh isi map (Workspace, StarterGui, dll.) akan langsung masuk ke Studio Lite!
+        </div>
+      </div>
+
+      <!-- TAB 3: HISTORY -->
+      <div id="historyTab" class="card fade-up" style="display: none;">
+        <h2 style="margin-top: 0; font-size: 1.25rem;">Riwayat Konversi &amp; ID Anda</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Nama File</th>
+              <th>Metode</th>
+              <th>ID Studio Lite</th>
+              <th>Pemakaian</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+
+      <!-- TAB 4: ADMIN PANEL (ADMINHCO) -->
+      <div id="adminTab" class="card fade-up" style="display: none;">
+        <h2 style="margin-top: 0; font-size: 1.25rem;">Panel Kontrol Admin (ADMINHCO)</h2>
+        <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 18px;">
+          Kelola saldo Credit setiap akun atau berikan <strong>Reward Gratis Upload</strong> berdasarkan jenis file (<code>.rbxl</code> atau <code>.rbxm</code>).
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Saldo Credit</th>
+              <th>Voucher Gratis</th>
+              <th>Aksi Admin (Credit &amp; Reward)</th>
+            </tr>
+          </thead>
+          <tbody id="adminUsersBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let authMode = 'login';
+    let currentUser = null;
+    let pickedFile = null;
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      document.getElementById('tabLoginBtn').classList.toggle('active', mode === 'login');
+      document.getElementById('tabRegBtn').classList.toggle('active', mode === 'register');
+      document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Masuk ke Dashboard' : 'Buat Akun Baru';
+      document.getElementById('authError').textContent = '';
+    }
+
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('authUsername').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const errEl = document.getElementById('authError');
+      errEl.textContent = '';
+
+      try {
+        const res = await fetch(`/api/auth/${authMode}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal autentikasi');
+        await loadSession();
+      } catch (err) {
+        errEl.textContent = err.message;
+      }
+    });
+
+    async function loadSession() {
+      const res = await fetch('/api/me');
+      if (!res.ok) {
+        document.getElementById('authScreen').style.display = 'block';
+        document.getElementById('appScreen').style.display = 'none';
+        return;
+      }
+      const data = await res.json();
+      currentUser = data.user;
+
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('appScreen').style.display = 'block';
+
+      document.getElementById('userBadge').textContent = `@${currentUser.username}`;
+      document.getElementById('creditBadge').textContent = `${currentUser.credits} Credit`;
+      document.getElementById('voucherRbxlBadge').textContent = `Gratis .RBXL: ${currentUser.free_rbxl_vouchers}`;
+      document.getElementById('voucherRbxmBadge').textContent = `Gratis .RBXM: ${currentUser.free_rbxm_vouchers}`;
+
+      document.getElementById('setUserId').value = currentUser.roblox_user_id || '';
+      document.getElementById('setUniverseId').value = currentUser.roblox_universe_id || '';
+      document.getElementById('setPlaceId').value = currentUser.roblox_place_id || '';
+      document.getElementById('keyHintText').textContent = currentUser.api_key_hint ? `(Tersimpan: ${currentUser.api_key_hint})` : '(Belum diatur)';
+
+      const isAdmin = currentUser.role === 'admin';
+      document.getElementById('adminTabBtn').style.display = isAdmin ? 'inline-block' : 'none';
+      if (isAdmin) loadAdminUsers();
+
+      const tbody = document.getElementById('historyBody');
+      tbody.innerHTML = (data.logs || []).map(l => `
+        <tr>
+          <td>${l.file_name}</td>
+          <td>${l.upload_mode === 'place_id' ? 'Place ID Bypass' : 'Model ID'}</td>
+          <td><strong>${l.result_id}</strong></td>
+          <td>${l.used_voucher ? 'Voucher Gratis' : `${l.credit_used} Credit`}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" style="color:var(--muted)">Belum ada riwayat upload.</td></tr>';
+
+      updateCostPreview();
+    }
+
+    function openTab(tabId, btn) {
+      ['uploadTab', 'settingsTab', 'historyTab', 'adminTab'].forEach(id => {
+        document.getElementById(id).style.display = id === tabId ? 'block' : 'none';
+      });
+      document.querySelectorAll('#appScreen .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function onFilePicked(file) {
+      if (!file) return;
+      pickedFile = file;
+      document.getElementById('selectedFileText').textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+      document.getElementById('displayName').value = file.name.replace(/\.(rbxlx?|rbxmx?)$/i, '').slice(0, 50);
+      if (/\.(rbxm|rbxmx)$/i.test(file.name)) {
+        document.getElementById('uploadTarget').value = 'model_id';
+      }
+      updateCostPreview();
+    }
+
+    function updateCostPreview() {
+      const target = document.getElementById('uploadTarget').value;
+      document.getElementById('modelOptions').style.display = target === 'model_id' ? 'block' : 'none';
+
+      if (!pickedFile || !currentUser) return;
+      const ext = pickedFile.name.slice(pickedFile.name.lastIndexOf('.')).toLowerCase();
+      const isPlace = ext === '.rbxl' || ext === '.rbxlx';
+      const sizeMB = Math.max(1, Math.ceil(pickedFile.size / (1024 * 1024)));
+      const cost = isPlace ? 10 + sizeMB * 3 : 5 + sizeMB * 2;
+
+      const hasVoucher = isPlace ? currentUser.free_rbxl_vouchers > 0 : currentUser.free_rbxm_vouchers > 0;
+      document.getElementById('costBanner').style.display = 'flex';
+      document.getElementById('costValue').textContent = hasVoucher
+        ? `GRATIS (Pakai 1 Voucher Gratis ${isPlace ? '.RBXL' : '.RBXM'})`
+        : `${cost} Credit (${ext.toUpperCase()} - ${sizeMB} MB)`;
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!pickedFile) return alert('Pilih file terlebih dahulu!');
+      const btn = document.getElementById('uploadBtn');
+      const resBox = document.getElementById('uploadResult');
+      btn.disabled = true;
+      btn.textContent = 'Sedang Mengunggah & Memproses ke Roblox...';
+      resBox.style.display = 'none';
+
+      const fd = new FormData();
+      fd.append('file', pickedFile);
+      fd.append('uploadTarget', document.getElementById('uploadTarget').value);
+      fd.append('displayName', document.getElementById('displayName').value.trim());
+      fd.append('mode', document.getElementById('convertMode').value);
+      fd.append('stripMedia', document.getElementById('stripMedia').checked ? 'true' : 'false');
+
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal upload');
+
+        resBox.style.display = 'block';
+        resBox.innerHTML = `
+          <div style="font-size:0.88rem; font-weight:600; color:var(--success);">
+            Berhasil! Masukkan ID berikut ke Toolbox &rarr; Import Model di Map Studio Lite:
+          </div>
+          <div class="id-box">
+            <span class="id-num">${data.resultId}</span>
+            <button type="button" class="btn secondary" onclick="navigator.clipboard.writeText('${data.resultId}'); this.textContent='Tersalin!'">Salin ID</button>
+          </div>
+          ${data.warningMsg ? `<div style="color:var(--warning); font-size:0.84rem; margin-top:10px;">${data.warningMsg}</div>` : ''}
+        `;
+        await loadSession();
+      } catch (err) {
+        resBox.style.display = 'block';
+        resBox.innerHTML = `<div style="color:var(--danger); font-weight:600; font-size:0.9rem;">Error: ${err.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Proses & Dapatkan ID Studio Lite';
+      }
+    });
+
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('settingsMsg');
+      msg.textContent = 'Menyimpan...';
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey: document.getElementById('setApiKey').value.trim(),
+          robloxUserId: document.getElementById('setUserId').value.trim(),
+          robloxUniverseId: document.getElementById('setUniverseId').value.trim(),
+          robloxPlaceId: document.getElementById('setPlaceId').value.trim()
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('setApiKey').value = '';
+        msg.style.color = 'var(--success)';
+        msg.textContent = 'Tersimpan dengan enkripsi AES-256!';
+        await loadSession();
+      } else {
+        msg.style.color = 'var(--danger)';
+        msg.textContent = data.error;
+      }
+    });
+
+    async function loadAdminUsers() {
+      const res = await fetch('/api/admin/users');
+      if (!res.ok) return;
+      const data = await res.json();
+      const tbody = document.getElementById('adminUsersBody');
+      tbody.innerHTML = data.users.map(u => `
+        <tr>
+          <td><strong>@${u.username}</strong> ${u.role === 'admin' ? '(Admin)' : ''}</td>
+          <td><strong>${u.credits}</strong> Credit</td>
+          <td>.RBXL: <strong>${u.free_rbxl_vouchers}</strong> | .RBXM: <strong>${u.free_rbxm_vouchers}</strong></td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="adminAction('${u.id}', 'add_credits', prompt('Tambah berapa Credit untuk @${u.username}?', '50'))">+ Isi Credit</button>
+            <button class="btn secondary" style="padding:6px 10px; font-size:0.78rem;" onclick="adminAction('${u.id}', 'set_credits', prompt('Set total Credit @${u.username} menjadi:', '${u.credits}'))">Set Credit</button>
+            <button class="btn" style="padding:6px 10px; font-size:0.78rem;" onclick="adminAction('${u.id}', 'give_voucher', 1, 'rbxl')">+1 Gratis .RBXL</button>
+            <button class="btn" style="padding:6px 10px; font-size:0.78rem;" onclick="adminAction('${u.id}', 'give_voucher', 1, 'rbxm')">+1 Gratis .RBXM</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function adminAction(targetUserId, action, amount, voucherType = '') {
+      if (amount === null || amount === '') return;
+      await fetch('/api/admin/reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId, action, amount: Number(amount), voucherType })
+      });
+      await loadSession();
+    }
+
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      loadSession();
+    }
+
+    loadSession();
+  </script>
+</body>
+</html>
